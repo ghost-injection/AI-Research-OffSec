@@ -15,19 +15,24 @@ telemetry.
 
 ### pid-sniper
 
-Arm it, click a window, get PID, process name, parent PID, window title, class,
-handle, and full executable path. A second mode watches for *new* top-level windows
-and logs each one as it appears, which is how a stager, a message box, or a
-credential prompt announces itself.
+Arm it, click a window, get the PID, process name, window class, and full executable
+path. The desktop build adds parent PID and a watcher for *transient consoles* - the
+cmd window a stager, installer, or scheduled task opens and closes in under a second.
+
+`popup_watch.py` is the radar by itself: it polls for new top-level windows (dialogs,
+toasts, browser popups, message boxes) and prints one JSON object per popup, which is
+how a credential prompt announces itself.
 
 ```bat
-pythonw pid_sniper.pyw            :: compact capture
-pythonw pid_sniper_desktop.pyw    :: full build: parent PID, capture history
+pythonw pid_sniper.pyw              :: click-to-identify, no console window
+pythonw pid_sniper_desktop.pyw      :: adds parent PID and transient-console watch
 python popup_watch.py --seconds 60  :: headless radar, one JSON object per new window
+python popup_watch.py --seconds 60 --all   :: include windows that already existed
 ```
 
-`popup_watch.py` is importable and CLI-runnable, so the radar can feed your own
-alerting instead of a GUI. Captures stay in memory unless you pass a log path.
+`popup_watch.py` is importable (`from popup_watch import PopupRadar`) as well as
+CLI-runnable, so the radar can feed your own alerting instead of a GUI. Captures stay
+in memory until you copy them out.
 
 ## What belongs in this repo
 
